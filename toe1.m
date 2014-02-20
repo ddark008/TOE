@@ -5,14 +5,14 @@ echo off
 kmax=input('kmax - максимальное число используемых гармоник; задайте kmax=');
 Umm=100; T=0.01;
 k=1:kmax;
-Bk=(Umm./(pi*k)).*(2*sin(pi*k/4).^2-cos(3*pi*k/2)+cos(2*pi*k))  % Здесь забить свои хтонические формулы
-Ck=(Umm./(pi*k)).*(sin(pi*k/2)+sin(3*pi*k/2)-sin(2*pi*k))       % Сделать тоже самое, при этом постаратся не вызвать Ктулху 
+Bk=(Umm./(pi.*k)).*(2.*sin(pi.*k./4).^2-cos(3.*pi.*k./2)+cos(2.*pi.*k)) % Здесь забить свои хтонические формулы
+Ck=(Umm./(pi.*k)).*(sin(pi.*k./2)+sin(3.*pi.*k./2)-sin(2.*pi.*k)) % Сделать тоже самое, при этом постаратся не вызвать Ктулху
 Umk=sqrt(Bk.^2+Ck.^2)
     Pcik=atan2(Ck,Bk);
-Pcikgr=atan2(Ck,Bk)
+Pcikgr=atan2d(Ck,Bk)
 % Построение графика дискретного спектра амплитуд входного напряжения
 figure(1)
-U0=0;  % Вместо 0 подставь своё значение
+U0=0; % Вместо 0 подставь своё значение
 Uspectr=[1:kmax+1];
 Uspectr(1)=U0;
 q=2:kmax+1;
@@ -29,7 +29,7 @@ for t=0:T/(10*kmax):T;
 tt(nt)=t;
     % 1. Построение столбца точных значений u(nt)
 u(nt)=0;
-if t<=T/4;              % Немного подумай и запиши свою кусочную функцию или что там у тебя
+if t<=T/4; % Немного подумай и запиши свою кусочную функцию или что там у тебя
     u(nt)=Umm;
 elseif t<=3*T/4
         u(nt)=0;
@@ -45,4 +45,25 @@ uu(nt)=a+U0;
 nt=nt+1;
 end
 plot(tt,[uu',u']),grid
+pause
+
+%Часть 2
+j=sqrt(-1);
+Z1=5-j.*45./k; Z2=30; Z3=j.*(30.*k-60./k);
+Z23=(Z2.*Z3)./(Z2+Z3); Z=Z1+Z23;
+Io=0;
+Imk=Umk./abs(Z);
+Phik=angle(Z);
+pciIk=Pcik-Phik;
+%Кривые
+nt=1;
+for t=0:T/(10*kmax):T;
+    b=0;
+    for v=1:kmax;
+        b=b+Imk(v)*sin(v*omg1*t+pciIk(v));
+    end
+TOK(nt)=b+Io;
+nt=nt+1;
+end
+plot(tt/T,[uu',u',10*TOK']),grid
 pause
